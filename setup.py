@@ -10,4 +10,7 @@ setup(
     download_url = 'https://github.com/aholyoke/mountebank-python/tarball/0.1',
     keywords = ['testing', 'mountebank'],
     classifiers = [],
+    install_requires = [
+    'requests>=2.5.3',
+    ]
 )

@@ -1,4 +1,11 @@
 import requests, json
+'''
+http://www.mbtest.org/
+imposter has multiple stubs
+stub has multiple predicates and responses
+predicates define which stub matches
+when a stub matches it uses its next response
+'''
 
 MOUNTEBANK_HOST = 'http://localhost'
 MOUNTEBANK_URL = MOUNTEBANK_HOST + ':2525'
@@ -22,10 +29,7 @@ def get_all_imposters():
 def get_imposter(port):
     return requests.get("{}/imposters/:{}".format(MOUNTEBANK_HOST, port))
 
-'''
-Imposter has multiple stubs
-Stub has multiple predicates and a list of responses
-'''
+
 
 class MountebankException(Exception):
     pass
@@ -85,4 +89,4 @@ if __name__ == '__main__':
     assert requests.post(ms.get_url('account_overview'), params={'advertiser': 'a', 'start_date': 'b'}).status_code == 400
 
     ms.destroy()
-    delete_al
+    delete_all_imposters()
