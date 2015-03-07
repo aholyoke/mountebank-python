@@ -4,6 +4,7 @@ Mountebank is a tool which makes it easier to write tests for [Microservice](htt
 
 ## Installation
 `npm install -g mountebank --production`
+
 `pip install mountebank-python`
 
 ## Usage
@@ -14,8 +15,11 @@ A stub has multiple "predicates" and "responses"
 Predicates define which stub matches
 when a stub matches it uses its next response
 
+Run `mb` to start mountebank
+
 In python:
-1. Define your imposters (example given in mountebank.py)
-2. Initialize a microservice object
-3. Make requests to it
+  1. Define your imposters (example given in mountebank.py)
+  2. Initialize a microservice object
+  3. Make requests to it
+
 Example usage in mountebank.py 
