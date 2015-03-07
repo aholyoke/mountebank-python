@@ -1,8 +1,8 @@
 from setuptools import setup
 setup(
     name = 'mountebank-python',
-    packages = ['mountebank-python'],
-    version = '0.1.1',
+    packages = ['mountebank'],
+    version = '0.1.2',
     description = 'A thin convenience wrapper for interacting with Mountebank from Python',
     author = 'Alex Holyoke',
     author_email = 'aholyoke@uwaterloo.ca',
