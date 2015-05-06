@@ -1,6 +1,7 @@
 # Mountebank-Python
 Simple bindings to make [Mountebank](http://www.mbtest.org) easier to use from Python
-Mountebank is a tool which makes it easier to write tests for [Microservice](http://martinfowler.com/articles/microservices.html) architectures by spawning processes which imitate servers locally.
+
+Mountebank is a tool which makes it easier to write tests for [Microservice](http://martinfowler.com/articles/microservices.html) architectures by spawning processes which imitate servers (ie. listening to ports locally and responding to HTTP requests).
 
 ## Installation
 `npm install -g mountebank --production`
@@ -10,10 +11,15 @@ Mountebank is a tool which makes it easier to write tests for [Microservice](htt
 ## Usage
 
 Imposter - A process which listens on a port (pretending to be a server)
+
 Imposter has multiple stubs
+
 A stub has multiple "predicates" and "responses"
+
 Predicates define which stub matches
+
 when a stub matches it uses its next response
+
 
 Run `mb` to start mountebank
 
