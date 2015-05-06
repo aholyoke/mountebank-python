@@ -10,15 +10,15 @@ Mountebank is a tool which makes it easier to write tests for [Microservice](htt
 
 ## Usage
 
-Imposter - A process which listens on a port (pretending to be a server)
+An "imposter" is a process which listens on a port (pretending to be a server)
 
-Imposter has multiple stubs
+An imposter has multiple "stubs"
 
-A stub has multiple "predicates" and "responses"
+A stub has a list of "predicates" and "responses"
 
-Predicates define which stub matches
+Predicates define if a stub matches and incoming HTTP request
 
-when a stub matches it uses its next response
+When a stub matches it responds with the next response in it's responses list
 
 
 Run `mb` to start mountebank
