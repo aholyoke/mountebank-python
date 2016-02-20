@@ -21,13 +21,13 @@ def delete_all_imposters():
     return requests.delete(IMPOSTERS_URL)
 
 def delete_imposter(port):
-    return requests.delete("{}/imposters/:{}".format(MOUNTEBANK_HOST, port))
+    return requests.delete("{}/imposters/{}".format(MOUNTEBANK_URL, port))
 
 def get_all_imposters():
     return requests.get(IMPOSTERS_URL)
 
 def get_imposter(port):
-    return requests.get("{}/imposters/:{}".format(MOUNTEBANK_HOST, port))
+    return requests.get("{}/imposters/{}".format(MOUNTEBANK_URL, port))
 
 
 
