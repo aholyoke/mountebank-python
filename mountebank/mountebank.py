@@ -13,11 +13,16 @@ MOUNTEBANK_URL = MOUNTEBANK_HOST + ':2525'
 IMPOSTERS_URL = MOUNTEBANK_URL + '/imposters'
 
 
-def create_imposter(definition):
+def create_imposter(definition, method='POST'):
     if isinstance(definition, dict):
-        return requests.post(IMPOSTERS_URL, json=definition)
+        return requests.request(method, IMPOSTERS_URL, json=definition)
     else:
-        return requests.post(IMPOSTERS_URL, data=definition)
+        return requests.request(method, IMPOSTERS_URL, data=definition)
+
+
+def create_all_imposters(definitions):
+    """ PUTting a list of definitions to the imposter endpoint creates imposters in bulk"""
+    return create_imposter(definitions, 'PUT')
 
 
 def delete_all_imposters():
@@ -41,7 +46,6 @@ class MountebankException(Exception):
 
 
 class Microservice(object):
-
     def __init__(self, definition):
         resp = create_imposter(definition)
         if resp.status_code != 201:
@@ -49,13 +53,33 @@ class Microservice(object):
         self.port = resp.json()['port']
 
     def get_url(self, *endpoint):
-        return "{}:{}{}".format(MOUNTEBANK_HOST, self.port, "".join('/' + name for name in endpoint))
+        return "{}:{}/{}".format(MOUNTEBANK_HOST, self.port, "/".join(name for name in endpoint))
 
     def get_self(self):
         return get_imposter(self.port)
 
     def destroy(self):
         return delete_imposter(self.port)
+
+
+class MicroserviceArchitecture(object):
+    def __init__(self, definitions):
+        resp = create_all_imposters(definitions)
+        if resp.status_code != 200:
+            raise MountebankException("{}: {}".format(resp.status_code, resp.text))
+        self.ports = [imp['port'] for imp in resp.json()['imposters']]
+
+    def get_url(self, port, *endpoint):
+        return "{}:{}/{}".format(MOUNTEBANK_HOST, port, "/".join(name for name in endpoint))
+
+    def get_self(self, port):
+        return get_imposter(port)
+
+    def destroy(self, port):
+        return delete_imposter(port)
+
+    def destroy_all(self):
+        delete_all_imposters()
 
 
 if __name__ == '__main__':
@@ -98,3 +122,40 @@ if __name__ == '__main__':
 
     ms.destroy()
     delete_all_imposters()
+
+    example_architecture = {
+        "imposters": [
+            {
+                "protocol": "http",
+                "port": 4546,
+                "stubs": [{
+                    "responses": [{"is": {"statusCode": 400}}],
+                    "predicates": [{
+                        "equals": {
+                            "path": "/a/b",
+                            "method": "POST"
+                        }
+                    }]
+                }],
+            },
+            {
+                "protocol": "http",
+                "port": 4547,
+                "mode": "binary"
+            },
+            {
+                "protocol": "smtp",
+                "port": 4548
+            }
+        ]
+    }
+    # are we webscale yet?
+    msa = MicroserviceArchitecture(example_architecture)
+    r1 = requests.post(msa.get_url(4546, 'a', 'b'))
+    r2 = requests.put(msa.get_url(4546, 'a', 'b'))
+    r3 = requests.post(msa.get_url(4546, 'a'))
+    r4 = requests.post(msa.get_url(4547, 'a'))
+    assert r1.status_code == 400
+    assert r2.status_code == 200
+    assert r3.status_code == 200
+    assert r4.status_code == 200
