@@ -1,4 +1,5 @@
-import requests, json
+import requests
+import json
 '''
 http://www.mbtest.org/
 imposter has multiple stubs
@@ -11,28 +12,33 @@ MOUNTEBANK_HOST = 'http://localhost'
 MOUNTEBANK_URL = MOUNTEBANK_HOST + ':2525'
 IMPOSTERS_URL = MOUNTEBANK_URL + '/imposters'
 
+
 def create_imposter(definition):
     if isinstance(definition, dict):
         return requests.post(IMPOSTERS_URL, json=definition)
     else:
         return requests.post(IMPOSTERS_URL, data=definition)
 
+
 def delete_all_imposters():
     return requests.delete(IMPOSTERS_URL)
+
 
 def delete_imposter(port):
     return requests.delete("{}/imposters/{}".format(MOUNTEBANK_URL, port))
 
+
 def get_all_imposters():
     return requests.get(IMPOSTERS_URL)
+
 
 def get_imposter(port):
     return requests.get("{}/imposters/{}".format(MOUNTEBANK_URL, port))
 
 
-
 class MountebankException(Exception):
     pass
+
 
 class Microservice(object):
 
@@ -57,7 +63,7 @@ if __name__ == '__main__':
       "protocol": "http",
       "stubs": [{
         "responses": [
-          { "is": { "statusCode": 400 }}
+          {"is": {"statusCode": 400}}
         ],
         "predicates": [{
           "and": [
@@ -85,8 +91,10 @@ if __name__ == '__main__':
     }
     ms = Microservice(example_imposter)
 
-    assert requests.post(ms.get_url('account_overview'), params={'advertiser': 'a', 'start_date': 'b', 'end_date': 'c'}).status_code == 200
-    assert requests.post(ms.get_url('account_overview'), params={'advertiser': 'a', 'start_date': 'b'}).status_code == 400
+    r1 = requests.post(ms.get_url('account_overview'), params={'advertiser': 'a', 'start_date': 'b', 'end_date': 'c'})
+    r2 = requests.post(ms.get_url('account_overview'), params={'advertiser': 'a', 'start_date': 'b'})
+    assert r1.status_code == 200
+    assert r2.status_code == 400
 
     ms.destroy()
     delete_all_imposters()
