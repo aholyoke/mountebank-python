@@ -2,7 +2,7 @@ from setuptools import setup
 setup(
     name = 'mountebank-python',
     packages = ['mountebank'],
-    version = '0.1.2',
+    version = '0.1.3',
     description = 'A thin convenience wrapper for interacting with Mountebank from Python',
     author = 'Alex Holyoke',
     author_email = 'aholyoke@uwaterloo.ca',
