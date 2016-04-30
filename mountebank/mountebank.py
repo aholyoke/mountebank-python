@@ -47,10 +47,26 @@ class MountebankException(Exception):
 
 class Microservice(object):
     def __init__(self, definition):
-        resp = create_imposter(definition)
+        self.definition = definition
+
+    def __enter__(self):
+        self.start()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop()
+
+    def __repr__(self):
+        return "Microservice(port={})".format(self.port)
+
+    def start(self):
+        resp = create_imposter(self.definition)
         if resp.status_code != 201:
             raise MountebankException("{}: {}".format(resp.status_code, resp.text))
         self.port = resp.json()['port']
+        return self
+
+    def stop(self):
+        return self.destroy()
 
     def get_url(self, *endpoint):
         return "{}:{}/{}".format(MOUNTEBANK_HOST, self.port, "/".join(name for name in endpoint))
@@ -64,16 +80,38 @@ class Microservice(object):
 
 class MicroserviceArchitecture(object):
     def __init__(self, definitions):
-        resp = create_all_imposters(definitions)
+        self.definitions = definitions
+
+    def __enter__(self):
+        self.start()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop()
+
+    def __repr__(self):
+        return "MicroserviceArchitecture(ports={})".format(self.ports)
+
+    def start(self):
+        resp = create_all_imposters(self.definitions)
         if resp.status_code != 200:
             raise MountebankException("{}: {}".format(resp.status_code, resp.text))
         self.ports = [imp['port'] for imp in resp.json()['imposters']]
 
+    def stop(self):
+        return [self.destroy(port) for port in self.ports]
+
     def get_url(self, port, *endpoint):
         return "{}:{}/{}".format(MOUNTEBANK_HOST, port, "/".join(name for name in endpoint))
 
+    def get_urls(self):
+        return [self.get_url(port) for port in self.ports]
+
     def get_self(self, port):
         return get_imposter(port)
+
+    def get_selves(self):
+        return [self.get_self(port) for port in self.ports]
 
     def destroy(self, port):
         return delete_imposter(port)
